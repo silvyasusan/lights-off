@@ -7,15 +7,16 @@
 body, html {
   height: 100%;
   overflow: hidden;
+  font-family: 'Courier New', monospace;
   background-color: #000;
-  font-family: 'Segoe UI', sans-serif;
 }
 
-#room {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-  background-color: #000;
+/* --- DARK SEARCH PHASE --- */
+#darkroom {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  z-index: 10;
   overflow: hidden;
 }
 
@@ -26,13 +27,92 @@ body, html {
   pointer-events: auto;
   user-select: none;
   z-index: 5;
-  filter: drop-shadow(0 0 60px rgba(255, 230, 150, 0.2));
-  transition: filter 0.2s ease;
+  filter: drop-shadow(0 0 50px rgba(255, 240, 180, 0.2));
+  transition: filter 0.3s ease;
 }
 
 #lamp.holding {
-  filter: drop-shadow(0 0 120px rgba(255, 230, 150, 0.7));
+  filter: drop-shadow(0 0 100px rgba(255, 240, 180, 0.7));
 }
+
+#switch {
+  position: absolute;
+  top: 40%;
+  right: 8%;
+  width: 30px;
+  height: 60px;
+  background-color: #333;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.5s;
+  z-index: 2;
+  cursor: pointer;
+}
+#switch.reveal {
+  opacity: 1;
+}
+
+/* --- COZY ROOM AFTER LIGHT --- */
+#cozyroom {
+  display: none;
+  position: absolute;
+  inset: 0;
+  background: #e9e4da;
+  background-image: url('assets/pixel_room_bg.png'); /* Optional pixel background */
+  background-size: cover;
+  z-index: 1;
+  overflow: hidden;
+}
+
+/* Light particles */
+#particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Birthday Message */
+#wall {
+  text-align: center;
+  margin-top: 60px;
+}
+
+#wall h1 {
+  font-size: 2.8rem;
+  color: #ffb6c1;
+  text-shadow: 1px 1px #fff, 2px 2px #ffa;
+  font-weight: bold;
+  animation: fadeIn 2s ease-in;
+}
+
+.fairy-lights {
+  width: 100%;
+  margin-top: -20px;
+}
+
+/* Pets, pillows, plants */
+#floor {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 20px;
+  padding-bottom: 40px;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+}
+
+.pet, .pillows, .plants {
+  width: 100px;
+  image-rendering: pixelated;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
 
 #switch {
   position: absolute;
