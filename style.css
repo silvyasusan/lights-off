@@ -164,3 +164,18 @@ body, html {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
 }
+
+
+
+
+.particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #fff8e8;
+  border-radius: 50%;
+  opacity: 0.6;
+  pointer-events: none;
+  transition: transform 0.2s;
+}
+
