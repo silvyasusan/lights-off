@@ -1,0 +1,86 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  height: 100%;
+  overflow: hidden;
+  background-color: #000;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+#room {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000;
+  overflow: hidden;
+}
+
+#lamp {
+  position: absolute;
+  width: 60px;
+  height: auto;
+  pointer-events: auto;
+  user-select: none;
+  z-index: 5;
+  filter: drop-shadow(0 0 60px rgba(255, 230, 150, 0.2));
+  transition: filter 0.2s ease;
+}
+
+#lamp.holding {
+  filter: drop-shadow(0 0 120px rgba(255, 230, 150, 0.7));
+}
+
+#switch {
+  position: absolute;
+  top: 40%;
+  right: 8%;
+  width: 30px;
+  height: 60px;
+  background-color: #333;
+  border-radius: 5px;
+  cursor: pointer;
+  opacity: 0;
+  z-index: 2;
+  transition: opacity 0.4s;
+}
+
+#switch.reveal {
+  opacity: 1;
+}
+
+#celebration {
+  display: none;
+  position: absolute;
+  inset: 0;
+  background-color: #f9f4e8;
+  z-index: 10;
+  text-align: center;
+  padding-top: 10%;
+}
+
+#celebration h1 {
+  font-size: 3rem;
+  color: #ff4081;
+  text-shadow: 2px 2px white;
+  animation: pop 1s ease-out;
+}
+
+@keyframes pop {
+  0% { transform: scale(0.2); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.pet {
+  width: 120px;
+  margin: 20px;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
