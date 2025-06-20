@@ -1,26 +1,212 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Happy Birthday BunBun</title>
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: #000;
+      touch-action: none;
+      font-family: 'Segoe UI', sans-serif;
+    }
+    #room {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      background: #000;
+    }
+    #orb {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,230,180,1) 0%, rgba(255,190,100,0.7) 60%, rgba(255,190,100,0.1) 100%);
+      pointer-events: auto;
+      user-select: none;
+      z-index: 5;
+      box-shadow: 0 0 60px 30px rgba(255, 230, 150, 0.2);
+      transition: box-shadow 0.2s ease;
+    }
+    #orb.holding {
+      box-shadow: 0 0 120px 60px rgba(255, 230, 150, 0.6);
+    }
+    #lightmask {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(255,230,180,0.3) 0%, rgba(0,0,0,0.9) 40%, #000 80%);
+      pointer-events: none;
+      mix-blend-mode: screen;
+      z-index: 2;
+    }
+    #switch {
+      position: absolute;
+      top: 40%;
+      right: 8%;
+      width: 30px;
+      height: 60px;
+      background-color: #333;
+      border-radius: 5px;
+      cursor: pointer;
+      opacity: 0;
+      z-index: 3;
+      transition: opacity 0.4s;
+    }
+    #switch.reveal {
+      opacity: 1;
+    }
+    #celebration {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: url('assets/celebration-bg.png') center center / cover no-repeat;
+      z-index: 10;
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      pointer-events: none;
+    }
+  </style>
 </head>
 <body>
   <div id="room">
-    <img id="lamp" src="assets/lamp.png" alt="lamp" draggable="false" />
+    <canvas id="particles"></canvas>
+    <div id="orb"></div>
+    <div id="lightmask"></div>
     <div id="switch"></div>
+    <div id="celebration"></div>
   </div>
+  <script>
+    const orb = document.getElementById('orb');
+    const mask = document.getElementById('lightmask');
+    const switchEl = document.getElementById('switch');
+    const celebration = document.getElementById('celebration');
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
 
-  <div id="celebration">
-    <canvas id="fairyCanvas"></canvas>
-    <div id="pixelRoom">
-      <h1>HAPPY BIRTHDAY BUNBUN</h1>
-      <div class="pillows"></div>
-      <div class="plants"></div>
-    </div>
-  </div>
+    let W = canvas.width = window.innerWidth;
+    let H = canvas.height = window.innerHeight;
 
-  <script src="script.js"></script>
+    const particles = [];
+    for (let i = 0; i < 80; i++) {
+      particles.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        size: Math.random() * 3 + 1,
+        glow: Math.random() * 0.5 + 0.5
+      });
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, W, H);
+      for (let p of particles) {
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0 || p.x > W) p.vx *= -1;
+        if (p.y < 0 || p.y > H) p.vy *= -1;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 200, 150, ${p.glow})`;
+        ctx.shadowColor = "rgba(255, 200, 150, 0.6)";
+        ctx.shadowBlur = 10;
+        ctx.fill();
+      }
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    let targetX = 0, targetY = 0;
+    let currentX = window.innerWidth / 2;
+    let currentY = window.innerHeight - 100;
+    let isDragging = false;
+    const velocity = { x: 0, y: 0 };
+    const damping = 0.1;
+    const friction = 0.85;
+    const gravity = 0.5;
+    const groundY = window.innerHeight - 60;
+
+    function animateOrb() {
+      const dx = targetX - currentX;
+      const dy = targetY - currentY;
+      velocity.x += dx * damping;
+      velocity.y += dy * damping + gravity;
+      velocity.x *= friction;
+      velocity.y *= friction;
+      currentX += velocity.x;
+      currentY += velocity.y;
+      if (!isDragging && currentY > groundY) {
+        currentY = groundY;
+        velocity.y = 0;
+      }
+      orb.style.transform = `translate(${currentX}px, ${currentY}px)`;
+      mask.style.background = `radial-gradient(circle at ${currentX + 40}px ${currentY + 40}px, rgba(255,230,180,0.3) 0%, rgba(0,0,0,0.9) 40%, #000 80%)`;
+      if (isDragging) requestAnimationFrame(animateOrb);
+    }
+
+    function getEventPos(e) {
+      return e.touches ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY };
+    }
+
+    function startDragging(e) {
+      isDragging = true;
+      orb.classList.add('holding');
+      const pos = getEventPos(e);
+      targetX = pos.x - 40;
+      targetY = pos.y - 40;
+      animateOrb();
+      checkNearSwitch();
+    }
+
+    function stopDragging() {
+      isDragging = false;
+      orb.classList.remove('holding');
+    }
+
+    function updateTarget(e) {
+      if (!isDragging) return;
+      const pos = getEventPos(e);
+      targetX = pos.x - 40;
+      targetY = pos.y - 40;
+    }
+
+    function checkNearSwitch() {
+      const orbRect = orb.getBoundingClientRect();
+      const switchRect = switchEl.getBoundingClientRect();
+      const dx = orbRect.left - switchRect.left;
+      const dy = orbRect.top - switchRect.top;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      if (distance < 100) {
+        switchEl.classList.add('reveal');
+      } else {
+        switchEl.classList.remove('reveal');
+      }
+      if (isDragging) requestAnimationFrame(checkNearSwitch);
+    }
+
+    orb.addEventListener('mousedown', startDragging);
+    orb.addEventListener('touchstart', startDragging);
+    window.addEventListener('mousemove', updateTarget);
+    window.addEventListener('touchmove', updateTarget);
+    window.addEventListener('mouseup', stopDragging);
+    window.addEventListener('touchend', stopDragging);
+
+    switchEl.addEventListener('click', () => {
+      document.getElementById('room').style.display = 'none';
+      celebration.style.display = 'block';
+    });
+  </script>
 </body>
 </html>
